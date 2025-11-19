@@ -12,9 +12,9 @@ jump = 5 # Сила прыжка
 gravi = 0.2 # Сила гравитации
 can_jump = True # Можно прыгать
 def draw():
-    screen.fill(WHITE)
-    screen.draw.filled_rect(dino, BLACK)
-    screen.draw.line((0, HEIGHT // 2 + dino.height), (WIDTH, HEIGHT // 2 + dino.height), BLACK)
+    screen.fill(WHITE) # Заполняем фон экрана белым цветом
+    screen.draw.filled_rect(dino, BLACK) # Рисуем динозавтрика - квадратик
+    screen.draw.line((0, HEIGHT // 2 + 40), (WIDTH, HEIGHT // 2 + 40), BLACK)
 
 def update():
     global dino_speed, can_jump
@@ -22,11 +22,15 @@ def update():
         dino_speed += gravi # Если мы в воздухе, добавляем гравитацию к скорости
         can_jump = False # Не можем прыгнуть, когда мы уже в воздухе!!!
     else: # Если мы падаем на или под линию, то возвращаем ровно в начальную позицию
-        dino.y = HEIGHT // 2
+        dino.y = HEIGHT // 2 + 40 - dino.height
         dino_speed = 0
         can_jump = True
-
-    if keyboard.space and can_jump:
+    if keyboard.up and can_jump:
         dino_speed -= jump
+    if keyboard.down:
+        dino.height = 20
+    else:
+        dino.height = 40
+
     dino.y += dino_speed
 pgzrun.go()
