@@ -3,23 +3,17 @@ import pgzrun
 WIDTH = 800
 HEIGHT = 600
 
-GREEN = (30, 120, 30)
+BLACK = (0, 0, 0) # Цвета
 WHITE = (255, 255, 255)
-hero = Rect(WIDTH // 2, HEIGHT // 2, 20, 20)
-speed = 5
+
+dino = Rect(60, HEIGHT // 2, 20, 20)
+
 def draw():
-    screen.fill(GREEN)
-    screen.draw.filled_rect(hero, WHITE)
+    screen.fill(WHITE)
+    screen.draw.filled_rect(dino, BLACK)
+    screen.draw.line((0, HEIGHT // 2 + dino.height),(WIDTH, HEIGHT // 2 + dino.height), BLACK)
 
 def update():
-    if keyboard.w and hero.top > 0:
-        hero.y -= speed
-    if keyboard.a and hero.left > 0:
-        hero.x -= speed
-    if keyboard.s and hero.bottom < HEIGHT:
-        hero.y += speed
-    if keyboard.d and hero.right < WIDTH:
-        hero.x += speed
-
+    pass
 
 pgzrun.go()
