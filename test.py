@@ -18,6 +18,12 @@ def draw():
 
 def update():
     global dino_speed, can_jump
+    
+    if keyboard.down:
+        dino.height = 20
+    else:
+        dino.height = 40
+
     if dino.bottom < HEIGHT // 2 + dino.height:
         dino_speed += gravi # Если мы в воздухе, добавляем гравитацию к скорости
         can_jump = False # Не можем прыгнуть, когда мы уже в воздухе!!!
@@ -27,10 +33,7 @@ def update():
         can_jump = True
     if keyboard.up and can_jump:
         dino_speed -= jump
-    if keyboard.down:
-        dino.height = 20
-    else:
-        dino.height = 40
+
 
     dino.y += dino_speed
 pgzrun.go()
