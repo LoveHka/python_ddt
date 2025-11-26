@@ -8,35 +8,43 @@ HEIGHT = 600    # Высота экрана
 WHITE = (255, 255, 255)     # Цвета
 BLACK = (0, 0, 0)           # ( Красный, Зелёный, Синий )
 
-score = 0   # Счёт
-start_time = time.time() # Когда началась игра
-timer = start_time # Сколько прошло времени
-max_time = 30   # Максимум времени
-game_over = False    # Конец игры  ( кончилась или нет )
-size = 30    # Размер мишени
-target = Rect(WIDTH // 2, HEIGHT // 2, size, size)  # Создаём мишень
+score = 0
+max_time = 10 # Время на игру в секундах
+start_time = time.time() # Запоминаем, когда начали игру !
+timer = 0
+game_over = True
+
+size = 30 # Размер цели
+target = Rect(WIDTH // 2, HEIGHT // 2, size, size)
 
 def on_mouse_down(pos):     # Если щёлкнули мышкой
     global score
-    if target.collidepoint(pos): # Если мышка была на мишени
+    if target.collidepoint(pos) and not game_over:
+        score += 1
         target.x = random.randint(0, WIDTH - size)
         target.y = random.randint(0, HEIGHT - size)
-        score += 1
 
 def draw():     # Функция для рисования
-    screen.fill(WHITE) #Заполняем экран белым цветом
-    if not game_over: # Если игра не закончилась то будет выполняться это условие:
-        screen.draw.filled_circle((target.x + size//2, target.y + size//2), size//2, BLACK) # Рисуем мишень
-        screen.draw.text("Счёт: " + str(score), (10, 10), color=BLACK) # Выводим на экран текст "Счет"
-        screen.draw.text("Время: " + str(int(max_time - timer)) + " секунд", (10, 35), color=BLACK)  # Выводим на экран текст "Время"
-    else: # Иначе
-        screen.draw.text("Вы набрали " + str(score) + " очков!", center=(WIDTH // 2, HEIGHT // 2),fontsize=60, color = BLACK)
-        # Выводим на экран текст, о том сколько вы набрали очков
+    screen.fill(WHITE)
+    if not game_over:
+        screen.draw.text(f"Счёт: {score}", (10, 10), color=BLACK)
+        screen.draw.text(f"Время: {int(timer)} секунд", (10, 30), color=BLACK)
+        screen.draw.filled_circle((target.x + size // 2, target.y + size // 2), size // 2, BLACK)
+    else:
+        screen.draw.text(f"Вы набрали {score} очков!", center=(WIDTH//2, HEIGHT//2-50), fontsize=60, color=BLACK)
+        screen.draw.text(f"Скорость реакции: {(max_time / score) if score > 0 else 'Вы ничего не нажали'}", center=(WIDTH // 2 - 50, HEIGHT // 2), color=BLACK)
+
 def update():   # Функция для обновления данных
-    global start_time, score, timer, game_over
-    timer = time.time() - start_time # Сколько времени с начала игры
-    if timer > max_time: # Пока таймер не перевесит максимальное время
-        game_over = True # Игра окончена
+    global timer, score, start_time, game_over
+    timer = time.time() - start_time
+    if timer > max_time: # Если время закончилось, то game over
+        game_over = True
+    if game_over: # Если игра закончена
+        if keyboard.space: # Если нажата клавиша space
+            score = 0 # Обновляем счёт
+            start_time = time.time() # Обновляем время начала игры
+            game_over = False
+
 
 
 pgzrun.go()
