@@ -8,14 +8,14 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
 
-hero = Rect(100, 300, 20, 40)
+hero = Rect(WIDTH // 2, HEIGHT // 2, 20, 40)
 
-cooldown = 0.5 # Это время перезарядки
+cooldown = 0.2 # Это время перезарядки
 last_attack = 0 # Когда была последняя атака?
 
 berries = [] # Пока что пусто. Тут будут лежать ягоды
-berrie_speed = 10 # СКорость начальная ягод наших, падаваны мои
-gravy = 0.2 # Гравитация
+berrie_speed = 15 # СКорость начальная ягод наших, падаваны мои
+gravy = 0.5 # Гравитация
 # Функция принимает от нас позицию мышки
 def attack(mouse_pos): # Это наша собственная функция для атаки.
     global last_attack # Узнаём, КОГДА была последняя атака
@@ -28,6 +28,10 @@ def attack(mouse_pos): # Это наша собственная функция �
         speed_y = berrie_speed * (dy / distance) # Скорость по оси игрек
         berries.append(
             [ Rect(hero.x, hero.y, 10, 10), speed_x, speed_y ]
+            # Теперь у нас есть ягодки :
+            # be[0] - Сам прямоугольник
+            # be[1] - Горизонтальная скорость
+            # be[2] - Вертикальная скорость
         )
 
 def on_mouse_down(pos): # При нажатии мышки
@@ -37,8 +41,8 @@ def draw():
     screen.fill(WHITE)
     screen.draw.filled_rect(hero, BLACK) # Рисуем персонажа
     # Рисуем ягодки
-    for berr in berries:
-        screen.draw.filled_rect(berr[0], RED)
+    for be in berries:
+        screen.draw.filled_rect(be[0], RED)
 def update():
 
     for be in berries: # Для каждой ягодки мы
@@ -48,8 +52,7 @@ def update():
 
         if be[0].top > HEIGHT: # Если ягодка скрылась под полом
             berries.remove(be) # Удаляем ягодку из нашего списка ( что бы она не падала бесконечно )
-    
-    
+
 
 
 pgzrun.go()
