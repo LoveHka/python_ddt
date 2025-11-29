@@ -17,7 +17,7 @@ b_speed = 10 # Скорость пуль
 
 enemies = [] # Пустой список для врагов
 e_speed = 2 # Скорость врагов
-chanse = 20
+chanse = 10
 
 def on_mouse_down(pos):     # Если щёлкнули мышкой
     # Математика для расчёта скорости пули
@@ -54,6 +54,10 @@ def update():   # Функция для обновления данных
         speed_y = e_speed * (dy / distance)  # умножаем модуль скорости на косинус
         e.x += speed_x
         e.y += speed_y
+        for b in bullets:  # Проверяем столкновения
+            if e.colliderect(b[0]):
+                bullets.remove(b)
+                enemies.remove(e)
 
     for b in bullets:
         b[0].x += b[1]
