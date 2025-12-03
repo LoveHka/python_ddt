@@ -3,10 +3,11 @@ import time
 import random
 
 WIDTH = 800
-HEIGHT = 600
+HEIGHT = 400
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
+ORANGE = (255, 100, 0)
 
 hero = Rect(WIDTH // 2, HEIGHT - 80, 20, 40)
 speed = 5
@@ -16,15 +17,15 @@ last_attack = 0 # Когда была последняя атака?
 
 berries = [] # Пока что пусто. Тут будут лежать ягоды
 berrie_speed = 15 # СКорость начальная ягод наших, падаваны мои
-gravy = 0.5 # Гравитация
+gravy = 0.4 # Гравитация
 
 
 baskets = [] # Список для корзин
 max_baskets = 4 #  Переменная для максиального количества корзин
-b_w = 30 # Ширина корзинки
+b_w = 40 # Ширина корзинки
 for i in range(max_baskets): # Заполняем список с корзинками
-    baskets.append( # Добавляем в конец списка прямоугольник 
-        Rect(random.randint(0, WIDTH - b_w), random.randint(100, WIDTH - 100) , 3, b_w)
+    baskets.append( # Добавляем в конец списка прямоугольник
+        Rect(random.randint(0, WIDTH - b_w), random.randint(100, WIDTH - 300) ,b_w, 3)
     )
 
 # Функция принимает от нас позицию мышки
@@ -51,8 +52,10 @@ def on_mouse_down(pos): # При нажатии мышки
 def draw():
     screen.fill(WHITE)
     screen.draw.filled_rect(hero, BLACK)
-    for be in berries:
+    for be in berries: # Рисуем ягодки
         screen.draw.filled_rect(be[0], RED)
+    for b in baskets:
+        screen.draw.filled_rect(b ,ORANGE)
 
 def update():
 
@@ -64,8 +67,8 @@ def update():
 
         if be[0].top > HEIGHT: # Если ягодка скрылась под полом
             berries.remove(be) # Удаляем ягодку из нашего списка ( что бы она не падала бесконечно )
-    
-    
+
+
 
 
     if keyboard.a and hero.left  > 0:
