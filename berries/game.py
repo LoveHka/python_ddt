@@ -22,12 +22,13 @@ gravy = 0.4 # Гравитация
 
 baskets = [] # Список для корзин
 max_baskets = 4 #  Переменная для максиального количества корзин
-b_w = 40 # Ширина корзинки
+b_w = 60 # Ширина корзинки
 for i in range(max_baskets): # Заполняем список с корзинками
     baskets.append( # Добавляем в конец списка прямоугольник
-        Rect(random.randint(0, WIDTH - b_w), random.randint(100, WIDTH - 300) ,b_w, 3)
+        Rect(random.randint(0, WIDTH - b_w), random.randint(50, HEIGHT - 150) ,b_w, 5)
     )
 
+score = 0
 # Функция принимает от нас позицию мышки
 def attack(mouse_pos): # Это наша собственная функция для атаки.
     global last_attack # Узнаём, КОГДА была последняя атака
@@ -52,13 +53,15 @@ def on_mouse_down(pos): # При нажатии мышки
 def draw():
     screen.fill(WHITE)
     screen.draw.filled_rect(hero, BLACK)
-    for be in berries: # Рисуем ягодки
+    for be in berries: # Рисуем ягодкиdddddd
         screen.draw.filled_rect(be[0], RED)
     for b in baskets:
         screen.draw.filled_rect(b ,ORANGE)
+    screen.draw.text(f" Счёт: {score}", center=(WIDTH // 2, 10), color=RED)
+
 
 def update():
-
+    global score # Добавляем переменные в функцию
 
     for be in berries: # Для каждой ягодки мы
         be[2] += gravy # Действуем на нёё гравитацией
@@ -68,6 +71,14 @@ def update():
         if be[0].top > HEIGHT: # Если ягодка скрылась под полом
             berries.remove(be) # Удаляем ягодку из нашего списка ( что бы она не падала бесконечно )
 
+        for bask in baskets:
+            if bask.colliderect(be[0]):
+                if be[2] >= 0:
+                    score += 1
+                    bask.x = random.randint(0, WIDTH - b_w) # тпхаем корзинку в случайное место
+                    bask.y = random.randint(50, HEIGHT - 150)
+                else:
+                    be[2] = be[2] * (-1) # Меняем направление движения
 
 
 
