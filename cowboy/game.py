@@ -52,8 +52,14 @@ def update():   # Функция для обновления данных
         return
 
     if random.randint(0, 600) < chanse: # Спавн врагов
+        if random.choice([True,False]):
+            ex = random.randint(0, WIDTH)
+            ey = random.choice([-100, HEIGHT + 100])
+        else:
+            ex = random.choice([-100, WIDTH + 100])
+            ey = random.randint(0, HEIGHT)
         enemies.append(
-            Rect(random.choice([-100, WIDTH + 100]), random.choice([-100, HEIGHT + 100]), 20, 20)
+            Rect(ex, ey, 20, 20)
         )
 
     for e in enemies: # Перемещение врагов
