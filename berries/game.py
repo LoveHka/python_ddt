@@ -1,6 +1,6 @@
 import pgzrun
 import time
-
+import random
 
 WIDTH = 800
 HEIGHT = 600
@@ -8,7 +8,8 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
 
-hero = Rect(WIDTH // 2, HEIGHT // 2, 20, 40)
+hero = Rect(WIDTH // 2, HEIGHT - 80, 20, 40)
+speed = 5
 
 cooldown = 0.2 # Это время перезарядки
 last_attack = 0 # Когда была последняя атака?
@@ -16,6 +17,16 @@ last_attack = 0 # Когда была последняя атака?
 berries = [] # Пока что пусто. Тут будут лежать ягоды
 berrie_speed = 15 # СКорость начальная ягод наших, падаваны мои
 gravy = 0.5 # Гравитация
+
+
+baskets = [] # Список для корзин
+max_baskets = 4 #  Переменная для максиального количества корзин
+b_w = 30 # Ширина корзинки
+for i in range(max_baskets): # Заполняем список с корзинками
+    baskets.append( # Добавляем в конец списка прямоугольник 
+        Rect(random.randint(0, WIDTH - b_w), random.randint(100, WIDTH - 100) , 3, b_w)
+    )
+
 # Функция принимает от нас позицию мышки
 def attack(mouse_pos): # Это наша собственная функция для атаки.
     global last_attack # Узнаём, КОГДА была последняя атака
@@ -39,11 +50,12 @@ def on_mouse_down(pos): # При нажатии мышки
 
 def draw():
     screen.fill(WHITE)
-    screen.draw.filled_rect(hero, BLACK) # Рисуем персонажа
-    # Рисуем ягодки
+    screen.draw.filled_rect(hero, BLACK)
     for be in berries:
         screen.draw.filled_rect(be[0], RED)
+
 def update():
+
 
     for be in berries: # Для каждой ягодки мы
         be[2] += gravy # Действуем на нёё гравитацией
@@ -52,7 +64,14 @@ def update():
 
         if be[0].top > HEIGHT: # Если ягодка скрылась под полом
             berries.remove(be) # Удаляем ягодку из нашего списка ( что бы она не падала бесконечно )
+    
+    
 
+
+    if keyboard.a and hero.left  > 0:
+        hero.x -= speed
+    if keyboard.d and hero.right  < WIDTH:
+        hero.x += speed
 
 
 pgzrun.go()
