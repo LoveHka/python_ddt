@@ -24,17 +24,17 @@ chanse = 10
 game_over = False
 score=0 # добавили счёт
 
-def on_mouse_down(pos):     # Если щёлкнули мышкой
+def on_mouse_down(pos):
+# Если щёлкнули мышкой
     # Математика для расчёта скорости пули
     dx = pos[0] - hero.x                    # Разница координат х мышки и героя
     dy = pos[1] - hero.y                     # Разница координат y мышки и героя
     distance = (dx**2 + dy**2)**0.5             # Расстояние между мышкой и героем
     speed_x = b_speed * ( dx / (distance + 0.00001) )       # умножкаем модуль скорости на синус
     speed_y = b_speed * ( dy / (distance + 0.00001) )       # умножаем модуль скорости на косинус
-
     bullets.append(
         [ Rect(hero.x + hero.width //2 - 2, hero.y + hero.height//2 - 2, 5, 5), speed_x, speed_y ] # Добавляем пулю
-    )
+        )
 
 def draw():     # Функция для рисования
     if not game_over:
@@ -81,6 +81,7 @@ def update():   # Функция для обновления данных
                 bullets.remove(b)
                 enemies.remove(e)
                 score += 1
+                break
 
         if e.colliderect(hero): # Столкновение с героем и конец игры
             game_over = True
