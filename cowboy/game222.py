@@ -11,7 +11,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0 ,0)
 
 hero = Rect(WIDTH // 2, HEIGHT // 2, 20, 20) # Создаём персонажа ( стоит в центре, размер 20 х 40 пикселей )
-h_speed = 0
+h_speed = 4
 
 bullets = [] # Пустой список для пуль
 b_speed = 10 # Скорость пуль
@@ -44,12 +44,15 @@ def draw():     # Функция для рисования
             screen.draw.filled_rect(b[0], RED) # Рисуем каждую пульку красным цветом
         for e in enemies:
             screen.draw.filled_rect(e, RED) # Рисуем каждого врага красным цветом
+        screen.draw.text(f"Счёт: {score}", center=(WIDTH//2, 20), color=RED)
+        screen.draw.text(f"Число пулек: {len(bullets)}", center=(WIDTH // 2, 40), color=RED)
     else:
         screen.fill(BLACK) # Заполняем экран
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2), color=RED, fontsize=100)
+        screen.draw.text(f"Вы набрали {score} очков", center=(WIDTH // 2, HEIGHT // 2 + 100), color=RED, fontsize=40)
 
 def update():   # Функция для обновления данных
-    global game_over
+    global game_over, score
     if game_over:
         return
 
@@ -77,14 +80,19 @@ def update():   # Функция для обновления данных
             if e.colliderect(b[0]):
                 bullets.remove(b)
                 enemies.remove(e)
+                score += 1
 
         if e.colliderect(hero): # Столкновение с героем и конец игры
             game_over = True
 
+    for b in bullets:
+        if b[0].top < 0 or b[0].bottom > HEIGHT or b[0].left < 0 or b[0].right > WIDTH:
+            bullets.remove(b)
+
     if keyboard.w and hero.top > 0:
         hero.y -= h_speed
     if keyboard.s and hero.bottom < HEIGHT:
-        hero.y -= h_speed
+        hero.y += h_speed
     if keyboard.a and hero.left > 0:
         hero.x -= h_speed
     if keyboard.d and hero.right < WIDTH:
