@@ -16,13 +16,12 @@ def update():
             client.setblocking(False)
         except: pass
 
-def on_key_down(key):
     if not client: return
     try:
-        if key == keys.W: client.send(b'W')
-        if key == keys.A: client.send(b'A')
-        if key == keys.S: client.send(b'S')
-        if key == keys.D: client.send(b'D')
+        if keyboard.w: client.send(b'W')
+        if keyboard.a: client.send(b'A')
+        if keyboard.s: client.send(b'S')
+        if keyboard.d: client.send(b'D')
     except: pass
 
 def draw():
