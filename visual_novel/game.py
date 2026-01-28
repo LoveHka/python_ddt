@@ -21,9 +21,24 @@ game = {
     "печаль" : {
         "текст" : "Ты остался и долго писал код, твои пальцы устали и ты попал во временную петлю...",
         "ответы" : [
-            ("Временную петлю???...", "печаль")
+            ("Временную петлю???...", "печаль"),
         ]
     }
 }
 
+def show_scene(scene_name):
+    for widget in window.winfo_children():  
+        widget.destroy()        # Удаляем все старые кнопки и текст
+    
+    scene = game[scene_name] # Загрузить нужную нам сцену
+
+    text = Label(window, text=scene["текст"], wraplength=400)
+    text.pack()                  # Рисуем новый текст
+
+    for knopka in scene["ответы"]:      ## Рисуем новые кнопки
+        button = Button(window, text=knopka[0], command=lambda x=knopka[1]: show_scene(x))
+        button.pack()
+
+
+show_scene("сцена 1")       # Запускаем первую сцену
 window.mainloop() # Запуск приложения
