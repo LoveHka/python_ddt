@@ -1,5 +1,8 @@
 from tkinter import *
 import json
+from time import time
+
+last = time() # Запишем время
 
 root = Tk()
 root.geometry("800x400")
@@ -8,20 +11,33 @@ root.title("Кликер типа да")
 money = 0  # Деньги
 
 items = {
-    "Легковушка" : {
-        "цена" : 40,
-        "доход" : 5
+    "Человек" : {
+        "цена" : 100,
+        "доход" : 1
     },
-    "Автобус" : {
-        "цена" : 80,
-        "доход" : 12
+    "Лошадь" : {
+        "цена" : 1500,
+        "доход" : 20
     }
+    ,
+    "Ветряная мельница" : {
+        "цена" : 10000,
+        "доход" : 150
+    },
+    "Водяная мельница" : {
+        "цена" : 15000,
+        "доход" : 240
+    },
+    "Паровой двигатель" : {
+        "цена" : 50000,
+        "доход" : 1000
+    }
+
 }
 
-inventory = {
-    "Легковушка" : 0,
-    "Автобус" : 0
-}
+inventory = {}
+for i in items:
+    inventory[i] = 0
 
 def SaveGame():
     data = {
@@ -40,9 +56,11 @@ def LoadGame():
         inventory = data["inventory"] # Сохраняем в Инвентарь значение из файла
 
 def addMoney():
-    global money
-    money += 2  # Добавляем две монетки
-    text.configure(text=f"{money} $")
+    global money, last
+    if time() - last > 0.2: # Если с момента последнего нажатия прошла минимум секунда
+        last = time()
+        money += 1  # Добавляем монетку
+        text.configure(text=f"{money} $")
 
 def BuySomething(something):
     global money, inventory
