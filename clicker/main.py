@@ -1,4 +1,5 @@
 from tkinter import *
+import json
 
 root = Tk()
 root.geometry("800x400")
@@ -22,6 +23,21 @@ inventory = {
     "Автобус" : 0
 }
 
+def SaveGame():
+    data = {
+        "money": money,
+        "inventory": inventory
+    }
+    filename = inputin.get()
+    if filename: # Если имя не пустое (то есть полльзователь что-то ввел)
+        json.dump(data, open(f"{filename}.json", "w", encoding="utf-8"))    #Сохраняем
+def LoadGame():
+    global money, inventory
+    filename = inputin.get()
+    if filename:
+        data = json.load(open(f"{filename}.json", "r", encoding="utf-8"))
+        money = data["money"] # Сохраняем в деньги значение из файла
+        inventory = data["inventory"] # Сохраняем в Инвентарь значение из файла
 
 def addMoney():
     global money
@@ -81,6 +97,17 @@ for item in items:
                  command=lambda x=item: BuySomething(x))
     btn.pack(pady=5, padx=5)
     buttons.append(btn)
+# Для загрузки файлов ( И выгрузки )
+loading = Frame(gameplay)
+loading.pack(padx=5,pady=5)
+
+inputin = Entry(loading)
+inputin.pack(side="left", padx=5,pady=5, expand = True)
+
+save = Button(loading, text="Сохранить", command=SaveGame)
+save.pack(side="left", pady=5,padx=5)
+load = Button(loading, text="Загрузить", command=LoadGame)
+load.pack(side="left", pady=5,padx=5)
 
 update()
 
