@@ -4,63 +4,83 @@ root = Tk()
 root.geometry("800x400")
 root.title("Кликер типа да")
 ######################
-money = 0               # Деньги
-house = 0               # Количество домов
-helicopter = 0          # Количество вертолётов
+money = 0  # Деньги
+
+items = {
+    "Легковушка" : {
+        "цена" : 40,
+        "доход" : 5
+    },
+    "Автобус" : {
+        "цена" : 80,
+        "доход" : 12
+    }
+}
+
+inventory = {
+    "Легковушка" : 0,
+    "Автобус" : 0
+}
+
 
 def addMoney():
     global money
-    money += 2       # Добавляем две монетки
+    money += 2  # Добавляем две монетки
     text.configure(text=f"{money} $")
-def buyHouse():         # Покупка дома
-    global house, money
-    if money >= 100:
-        house += 1
-        money -= 100
-def buyHelicopter():
-    global helicopter, money
-    if money >= 1000:
-        money -= 1000
-        helicopter += 1
+
+def BuySomething(something):
+    global money, inventory
+    if money >= items[something]["цена"]:
+        inventory[something] += 1 # Увеличивем количество предмета в инвенторе
+        money -= items[something]["цена"] # Уменьшаем количество денег
+
 def update():
     global money
-    money += house * 1 + helicopter * 5
-    text.configure(text=f"{money} $")
-    information.configure(text=f"""
-    Вертолётов: {helicopter}
-    Домов:      {house}
-    
-    Заработок в секунду: {house * 1 + helicopter * 5}
-""")
+
+    for i in inventory:
+        money += inventory[i] * items[i]['доход'] # Добавляем доход от каждого предмета
+
+    text.configure(text=f"{money} $")   # Обновим инфу о денежках
+
+    to_show = "Вы уже приобрели:\n" # временная строка
+    for i in inventory:
+        if inventory[i] > 0:
+            to_show += f"{i}: {inventory[i]} \n" # Добавляем Название: количество
+
+    information.configure(text=to_show) # Показываем всё на экране
 
     root.after(1000, update)
+
 
 ###################
 tools = Frame(root, bg="lightblue")
 tools.pack(side="left", fill="y", pady=5, padx=5)
 
 gameplay = Frame(root, bg="red")
-gameplay.pack(expand = True, fill="both", pady=5, padx=5)
+gameplay.pack(expand=True, fill="both", pady=5, padx=5)
 
 score = Frame(gameplay, bg="pink")
 score.pack(fill="both", pady=5, padx=5)
 
-text = Label(score, text="MONEY", font=("", 22))
+text = Label(score, text="MONEY", bg="pink", font=("", 22))
 text.pack(pady=5, padx=5)
-but = Button(score, width=10, height=2, bg="black", command=addMoney)
+but = Button(score, width=20, height=4, text="CLICK!", bg="red", command=addMoney)
 but.pack(pady=5, padx=5)
 
 info = Frame(gameplay, bg="yellow")
 info.pack(expand=True, fill="both", pady=5, padx=5)
 
-information = Label(info, text="У вас пока нет ничего...", font=("", 22))
+information = Label(info, bg="yellow", text="У вас пока нет ничего...", font=("", 22))
 information.pack(anchor="nw", padx=5, pady=5)
 
-red_button = Button(tools, text="Дом\n100$", bg = "brown", height=3, width=10, font=("", 16), command=buyHouse)
-blue_button = Button(tools,text="Вертолёт\n1000$", bg = "violet", height=3, width=10, font=("", 16), command=buyHelicopter)
-
-red_button.pack(pady=5, padx=5)
-blue_button.pack(pady=5, padx=5)
+buttons = [] # Сюда положим все-все кнопки для покупки
+for item in items:
+    btn = Button(tools,
+                 text=f"{item}\n{items[item]['цена']}$ / + {items[item]['доход']}$",
+                 width=20, height=2,
+                 command=lambda x=item: BuySomething(x))
+    btn.pack(pady=5, padx=5)
+    buttons.append(btn)
 
 update()
 
