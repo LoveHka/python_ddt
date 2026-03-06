@@ -3,7 +3,7 @@ from bottle import route, run, request
 @route("/")
 def home():
     return """
-    <form action="/name" method="post">
+    <form action="/" method="post">
     <b>Ваше имя:</b>
     <div><input name="username"></div>
     <div><input name="password"></div>
