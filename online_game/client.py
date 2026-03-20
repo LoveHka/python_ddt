@@ -1,4 +1,4 @@
-import pgzero
+import pgzrun
 import socket
 
 WIDTH = 600
@@ -40,7 +40,25 @@ def update():
     except:
         pass
 
-def parse_state(state)
+def parse_state(state):
 
-    play
+    players.clear()
 
+    parts = state.split(";")
+
+    for part in parts:
+        if part:
+            pid, px, py = part.split(":")
+            players[int(pid)] = (int(px), int(py))
+
+def draw():
+
+    screen.clear()
+
+    for pid, (px, py) in players.items():
+
+        screen.draw.filled_rect(Rect((px, py), (30, 30)), "white")
+
+        screen.draw.text(str(pid), (px, py), color="black")
+
+pgzrun.go()
