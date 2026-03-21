@@ -1,64 +1,72 @@
 import pgzrun
 import socket
+import threading
 
-WIDTH = 600
-HEIGHT = 400
+SERVER = "192.168.0.155"
+PORT = 12345
 
-server = ("192.168.3.75", 12345)
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-sock.setblocking(False)
-
-
-x = 300
-y = 200
-
-speed = 3
+WIDTH = 800
+HEIGHT = 600
 
 players = {}
+players_lock = threading.Lock()
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+client.connect((SERVER, PORT))
+
+def send_move(directrion):
+    client.send(directrion.encode())
+
+def recive_loop():
+    while True:
+        data = client.recv(1024)
+        msg = data.decode().strip()
+
+        new_players = {}
+
+        if msg:
+            parts = msg.split(";")
+            for p in parts:
+                if not p:
+                    continue
+                try:
+                    ip, x, y = p.split(":")
+                    new_players[ip] = (int(x), int(y))
+                except:
+                    pass
+
+            with players_lock:
+                players.clear()
+                players.update(new_players)
+
+threading.Thread(target=recive_loop, daemon=True).start()
 
 def update():
-    global x, y
 
-    if keyboard.left:
-        x -= speed
-    if keyboard.right:
-        x += speed
-    if keyboard.up:
-        y -= speed
-    if keyboard.down:
-        y += speed
-
-    msg = f"{x},{y}"
-    sock.sendto(msg.encode(), server)
-
-
-    try:
-        data, _ = sock.recvfrom(1024)
-        parse_state(data.decode())
-    except:
-        pass
-
-def parse_state(state):
-
-    players.clear()
-
-    parts = state.split(";")
-
-    for part in parts:
-        if part:
-            pid, px, py = part.split(":")
-            players[int(pid)] = (int(px), int(py))
+    if keyboard.w:
+        send_move("up")
+    if keyboard.a:
+        send_move("left")
+    if keyboard.s:
+        send_move("down")
+    if keyboard.d:
+        send_move("right")
 
 def draw():
+    screen.fill((20,20,20))
 
-    screen.clear()
+    with players_lock:
+        current_players = dict(players)
 
-    for pid, (px, py) in players.items():
+        # center_x = WIDTH // 2
+        # center_y = HEIGHT // 2
+        if not current_players:
+            screen.draw.text("No players!", (20,20), fontsize=40, color="white")
+            return
 
-        screen.draw.filled_rect(Rect((px, py), (30, 30)), "white")
-
-        screen.draw.text(str(pid), (px, py), color="black")
+        for ip, (x, y) in current_players.items():
+            rect = Rect(x - 10, y -10, 20, 20)
+            screen.draw.filled_rect(rect, "deepskyblue")
+            screen.draw.rect(rect, "white")
 
 pgzrun.go()
