@@ -35,12 +35,12 @@ win = [[0,3,6],[1,4,7],[2,5,8],[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]]
 # Функция для проверки, что вариант выйгрышный
 def is_win(field, flag):
     iswin = False # Предположим, что проигрышный
-    for variant in win:
-        for pos in variant:
-            if field[pos] != flag:
-                iswin=False
-                break
-            iswin = True
+    for variant in win: # Для каждого победного варианта
+        for pos in variant: # ПРоверяем каждую позицию
+            if field[pos] != flag:  # Если в поле на победной позиции нет нашего маркера
+                iswin=False         # Мы пока не победили
+                break               # Сразу переходим к другой позиции
+            iswin = True            # Сюда мы попадем только, если позиции победные
         if iswin == True:
             return True
     return False
@@ -59,13 +59,14 @@ while True:
              " ", " ", " "]
     show_field(field)
 
-    end_game= False
+    end_game= False # Флаг окончания игры
 
     opponent_flag = "O"
     my_flag = "X"
     if status != "s":
         opponent_flag = "X"
         my_flag = "O"
+
     if status != "s":
         while True:
             turn = input("Ваш ход:\n>")
@@ -98,6 +99,10 @@ while True:
                 end_game = True
             show_field(field)
             sendmsg(turn)
+
+        if " " not in field:
+            print("Ничья!")
+            end_game = True
 
 
 
