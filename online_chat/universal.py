@@ -1,7 +1,5 @@
 import socket
 import random
-from dataclasses import field
-from distutils.command.sdist import show_formats
 
 status = input("Вы будете сервер(s) или клиент(c) ?\n>")
 
