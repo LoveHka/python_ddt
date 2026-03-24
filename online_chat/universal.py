@@ -46,11 +46,13 @@ def is_win(field, flag):
     return False
 
 def show_field(field):
-    print(field[0], "|", field[1], "|",field[2])
-    print("-"*9)
-    print(field[3], "|", field[4], "|", field[5])
-    print("-"*9)
-    print(field[6], "|", field[7], "|", field[8])
+    print("*"*20)
+    print(field[0], "|", field[1], "|",field[2], "\t0 | 1 | 2")
+    print("-"*9, "\t","-"*9)
+    print(field[3], "|", field[4], "|", field[5], "\t3 | 4 | 5")
+    print("-"*9, "\t","-"*9)
+    print(field[6], "|", field[7], "|", field[8], "\t6 | 7 | 8")
+    print("*" * 20)
 
 c=1
 if status != "s":
@@ -63,7 +65,7 @@ while True:
              " ", " ", " ",
              " ", " ", " "]
     show_field(field)
-
+    print("Поле создано")
     end_game= False # Флаг окончания игры
 
     opponent_flag = "O"
@@ -71,10 +73,11 @@ while True:
     if status != "s":
         opponent_flag = "X"
         my_flag = "O"
-    
+
     c += 1
     if c % 2 == 0:
         while True:
+
             turn = input("Ваш ход:\n>")
             if field[int(turn)] == " ":
                 field[int(turn)] = my_flag
@@ -84,15 +87,16 @@ while True:
         sendmsg(turn)
         show_field(field)
 
-    while True:
-        if " " not in field:
-            print("Ничья!")
-            end_game = True
-            break
+    while not end_game:
+
         print("Ждём соперника...")
         turn = recvmsg()
         field[int(turn)] = opponent_flag
         show_field(field)
+        if " " not in field:
+            print("Ничья!")
+            end_game = True
+            break
         if is_win(field, opponent_flag):
             print("Победил соперник!!!")
             end_game = True
