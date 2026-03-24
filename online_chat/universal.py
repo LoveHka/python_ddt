@@ -52,6 +52,11 @@ def show_field(field):
     print("-"*9)
     print(field[6], "|", field[7], "|", field[8])
 
+c=1
+if status != "s":
+    c=2
+
+
 while True:
     # Создаём поле для игры
     field = [" ", " ", " ",
@@ -66,8 +71,9 @@ while True:
     if status != "s":
         opponent_flag = "X"
         my_flag = "O"
-
-    if status != "s":
+    
+    c += 1
+    if c % 2 == 0:
         while True:
             turn = input("Ваш ход:\n>")
             if field[int(turn)] == " ":
@@ -79,6 +85,10 @@ while True:
         show_field(field)
 
     while True:
+        if " " not in field:
+            print("Ничья!")
+            end_game = True
+            break
         print("Ждём соперника...")
         turn = recvmsg()
         field[int(turn)] = opponent_flag
@@ -89,6 +99,7 @@ while True:
         else:
             while True:
                 turn = input("Ваш ход:\n>")
+
                 if field[int(turn)] == " ":
                     field[int(turn)] = my_flag
                     break
@@ -100,9 +111,7 @@ while True:
             show_field(field)
             sendmsg(turn)
 
-        if " " not in field:
-            print("Ничья!")
-            end_game = True
+
 
 
 
