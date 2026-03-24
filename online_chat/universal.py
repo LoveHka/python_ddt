@@ -1,5 +1,4 @@
 import socket
-import random
 
 status = input("Вы будете сервер(s) или клиент(c) ?\n>")
 
@@ -42,7 +41,6 @@ def is_win(field, flag):
                 iswin=False
                 break
             iswin = True
-            break
         if iswin == True:
             return True
     return False
@@ -77,8 +75,10 @@ while True:
             else:
                 print("Сюда нельзя сходить!")
         sendmsg(turn)
+        show_field(field)
 
     while True:
+        print("Ждём соперника...")
         turn = recvmsg()
         field[int(turn)] = opponent_flag
         show_field(field)
@@ -98,11 +98,6 @@ while True:
                 end_game = True
             show_field(field)
             sendmsg(turn)
-
-
-
-    show_field()
-
 
 
 
