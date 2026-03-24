@@ -50,9 +50,9 @@ def is_win(field, flag):
 
 def show_field(field):
     print(field[0], "|", field[1], "|",field[2])
-    print("-"*5)
+    print("-"*9)
     print(field[3], "|", field[4], "|", field[5])
-    print("-"*5)
+    print("-"*9)
     print(field[6], "|", field[7], "|", field[8])
 
 while True:
