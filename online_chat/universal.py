@@ -1,6 +1,7 @@
 import socket
 import random
 from dataclasses import field
+from distutils.command.sdist import show_formats
 
 status = input("Вы будете сервер(s) или клиент(c) ?\n>")
 
@@ -61,9 +62,7 @@ while True:
              " ", " ", " ",
              " ", " ", " "]
     show_field(field)
-    if status != "s":
-        msg = input("Введите номер позиции")
-        sendmsg(msg)
+
     end_game= False
 
     opponent_flag = "O"
@@ -71,10 +70,20 @@ while True:
     if status != "s":
         opponent_flag = "X"
         my_flag = "O"
+    if status != "s":
+        while True:
+            turn = input("Ваш ход:\n>")
+            if field[int(turn)] == " ":
+                field[int(turn)] = my_flag
+                break
+            else:
+                print("Сюда нельзя сходить!")
+        sendmsg(turn)
 
     while True:
-        turn = int(recvmsg())
-        field[turn] = opponent_flag
+        turn = recvmsg()
+        field[int(turn)] = opponent_flag
+        show_field(field)
         if is_win(field, opponent_flag):
             print("Победил соперник!!!")
             end_game = True
@@ -82,17 +91,19 @@ while True:
             while True:
                 turn = input("Ваш ход:\n>")
                 if field[int(turn)] == " ":
+                    field[int(turn)] = my_flag
                     break
                 else:
                     print("Сюда нельзя сходить!")
             if is_win(field, my_flag):
-                print("Победил соперник!!!")
+                print("Вы победили!!!")
                 end_game = True
+            show_field(field)
             sendmsg(turn)
 
-        show_field(field)
 
 
+    show_field()
 
 
 
