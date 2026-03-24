@@ -1,5 +1,6 @@
 import socket
 import random
+from dataclasses import field
 
 status = input("Вы будете сервер(s) или клиент(c) ?\n>")
 
@@ -31,21 +32,68 @@ def recvmsg():
         return sock.recv(1024).decode()
 
 print("Соединение успешно!")
+# Список выйгрышных вариантов
+win = [[0,3,6],[1,4,7],[2,5,8],[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]]
+# Функция для проверки, что вариант выйгрышный
+def is_win(field, flag):
+    iswin = False # Предположим, что проигрышный
+    for variant in win:
+        for pos in variant:
+            if field[pos] != flag:
+                iswin=False
+                break
+            iswin = True
+            break
+        if iswin == True:
+            return True
+    return False
 
-msg = ""
-if status != "s":
-    msg = input(">")
-    sendmsg(msg)
-    msg = ""
-    
-
+def show_field(field):
+    print(field[0], "|", field[1], "|",field[2])
+    print("-"*5)
+    print(field[3], "|", field[4], "|", field[5])
+    print("-"*5)
+    print(field[6], "|", field[7], "|", field[8])
 
 while True:
-    print("Ждём сообщения...")
-    print(recvmsg())
-    msg = ""
-    while msg == "":
-        msg = input(">")
+    # Создаём поле для игры
+    field = [" ", " ", " ",
+             " ", " ", " ",
+             " ", " ", " "]
+    show_field(field)
+    if status != "s":
+        msg = input("Введите номер позиции")
         sendmsg(msg)
+    end_game= False
+
+    opponent_flag = "O"
+    my_flag = "X"
+    if status != "s":
+        opponent_flag = "X"
+        my_flag = "O"
+
+    while True:
+        turn = int(recvmsg())
+        field[turn] = opponent_flag
+        if is_win(field, opponent_flag):
+            print("Победил соперник!!!")
+            end_game = True
+        else:
+            while True:
+                turn = input("Ваш ход:\n>")
+                if field[int(turn)] == " ":
+                    break
+                else:
+                    print("Сюда нельзя сходить!")
+            if is_win(field, my_flag):
+                print("Победил соперник!!!")
+                end_game = True
+            sendmsg(turn)
+
+        show_field(field)
+
+
+
+
 
 
