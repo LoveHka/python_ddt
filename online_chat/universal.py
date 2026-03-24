@@ -28,7 +28,7 @@ def recvmsg():
         return sock.recv(1024).decode()
 
 print("Соединение успешно!")
-if status == "s":
+if status != "s":
     sendmsg(input(">"))
 while True:
     print("Ждём сообщения...")
