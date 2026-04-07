@@ -84,9 +84,9 @@ def broadcast(message):
         except:
             dead_clients.append(conn)
 
-    for conn in dead_clients:
-        if conn in clients:
-            del clients[conn]
+    #for conn in dead_clients:
+        #if conn in clients:
+            #del clients[conn]
 # ------ TO_CLIENT -------
 
 def send_to_client(conn, message):
@@ -104,16 +104,16 @@ def send_to_client(conn, message):
 def start_game(user):
     user.in_game = True
     user.secret_number = random.randint(0, 20)
-    user.attempts_left = 3
+    user.attempts_left = 5
 
-    broadcast(f"[GAME] {user.username}, у тебя 3 попытки. Я загадал число от 0 до 20")
+    broadcast(f"[GAME] {user.username}, у тебя 5 попытки. Я загадал число от 0 до 20")
 
 
-def handle_guess(user, message):
+def handle_guess(user, conn, message):
     try:
         guess = int(message)
     except ValueError:
-        broadcast(f"[GAME] {user.username}, введи число")
+        send_to_client(conn, f"[GAME] {user.username}, введи число")
         return
 
     user.attempts_left -= 1
@@ -130,7 +130,7 @@ def handle_guess(user, message):
         return
 
     if user.attempts_left <= 0:
-        broadcast(f"[GAME] {user.username} проиграл. Было число: {user.secret_number}")
+        send_to_client(conn,f"[GAME] {user.username} проиграл. Было число: {user.secret_number}")
         user.in_game = False
         return
 
@@ -139,7 +139,7 @@ def handle_guess(user, message):
     else:
         hint = "меньше"
 
-    broadcast(f"[GAME] {user.username}, неверно. Подсказка: {hint}. Осталось попыток: {user.attempts_left}")
+    send_to_client(conn,f"[GAME] {user.username}, неверно. Подсказка: {hint}. Осталось попыток: {user.attempts_left}")
 
 
 # --- CSASINO
@@ -220,6 +220,8 @@ def handle_client(conn, addr):
                 if command.upper() == "REGISTER":
                     ok, _ = register(username, password)
                     if ok:
+                        user = User(username, addr)
+                        clients[conn] = user
                         broadcast(f"[REG] Новый пользователь: {username}")
 
                 elif command.upper() == "LOGIN":
@@ -235,7 +237,7 @@ def handle_client(conn, addr):
             # --- AFTER LOGIN ---
             if message.upper() == "LIST":
                 user_list = [u.username for u in clients.values()]
-                broadcast("[ONLINE] \n"+ '\n > '.join(user_list))
+                broadcast("[ONLINE] \n > "+ '\n > '.join(user_list))
                 continue
 
             # --- START GAME ---
@@ -248,7 +250,7 @@ def handle_client(conn, addr):
 
             # --- GAME PROCESS ---
             if user.in_game:
-                handle_guess(user, message)
+                handle_guess(user, conn, message)
                 continue
             # --- CASINO ---
             if message.upper().startswith("CASINO"):
