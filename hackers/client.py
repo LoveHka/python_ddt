@@ -1,55 +1,52 @@
-import socket
-import threading
-import tkinter as tk
+import socket           # Для интернета
+import threading        # Многопоточность
+import tkinter as tk    # Интерфейс
 
-from pyexpat.errors import messages
+HOST = "192.168.31.232" # Адрес компьютера
+PORT = 7000             # Адрес программы
 
-HOST = "192.168.31.232"
-PORT = 7000
+sock = socket.socket()  # Создаем устройство для подключения
+sock.connect((HOST, PORT))  # Подключаемся к серверу
 
-# ---- SOCKET ------
-sock = socket.socket()
-sock.connect((HOST, PORT))
+root = tk.Tk()              # Главное окно
+root.title("Чат ДДТ !!!")   # Название программы
 
-# --- ИНтерфейс ---
-root = tk.Tk()
-root.title("Chat DDT")
+text = tk.Text(root, height=40, width=100)  # Добавляем окошко с текстом
+text.pack()                         # Кладем его на главное окно
 
-text = tk.Text(root, height=40, width=100)
-text.pack()
+frame = tk.Frame(root)          # Контейнер для ввода
+frame.pack()                    # Кладем контейнер в окно
 
-frame = tk.Frame(root)
-frame.pack()
+entry = tk.Entry(frame, width=90)   # Создаем поле для ввода
+entry.pack(side="left")             # Кладем в контейнер слева направо
 
-entry = tk.Entry(frame, width = 80)
+def send():             # Функция для отправки сообщения
+    msg = entry.get() + "\n"    # берем данные из ввода
+    sock.sendall(msg.encode())  # Отправляем сообщение на сервер
+    entry.delete(0, tk.END) # Полностью очищаем ввод
 
-entry.pack(side="left")
+btn = tk.Button(frame, text="Отправить", command=send) # Кнопка отправки
+btn.pack(side="left")       # Кладем вслед за полем ввода
 
-def send():
-    msg = entry.get() + "\n"
-    if msg:
-        sock.sendall(msg.encode())
-        entry.delete(0, tk.END)
+def recive():   # Функция для получения сообщений
+    while True: # Бесконечго делаем
+        try:    # Пробуем получить сообщение -----
+            data = sock.recv(1024)   # Получить сообщение
+            if not data:            # Если оно пустое или с ошибками
+                break               # Значит разрываем соединение
 
 
-btn = tk.Button(frame, text="Отправить", command=send)
-btn.pack(side="left")
+            message = data.decode() # Раскодируем информацию
 
-def recive():
-    while True:
-        try:
-            data = sock.recv(1024)
-            if not data:
-                break
+            text.insert(tk.END, message) # Вставляем сообщение в конец текста
+            text.see(tk.END) # Прокручиваем текст в самый низ
 
-            message = data.decode()
-
-            text.insert(tk.END, message)
-
+        except: # Если случилась ошибка, отключаемся ----
+            text.insert(tk.END, "УПС! СЕРВЕР потерялся...")
             text.see(tk.END)
-        except:
             break
 
 threading.Thread(target=recive, daemon=True).start()
-
+# Слушаем сообщения в отдельном потоке
 root.mainloop()
+# Запускаем главный цикл
