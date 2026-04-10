@@ -22,8 +22,12 @@ class User:
 
         # --- game state ---
         self.in_game = "none"
+        # --- угадайка ---
         self.secret_number = None
         self.attempts_left = 0
+        # --- блекджек ---
+        self.black_cards = []
+        self.black_score = 0
 
     def to_dict(self):
         return {
@@ -31,6 +35,12 @@ class User:
             "exp": self.exp,
             "money": self.money
         }
+
+to_blackjack = []
+
+def blackjack_start(user):
+
+
 
 help_message = """----------------------------------------------------------
     Добро пожаловать на сервер!
@@ -235,6 +245,8 @@ def handle_client(conn, addr):
                         clients[conn] = user
                         broadcast(f"[REG] Новый пользователь: {username}")
                         continue
+                    if _ == "exist":
+                        send_to_client(conn, "Такой пользователь уже существует")
 
                 elif command.upper() == "!ВХОД":
                     ok, _ = login(username, password)
@@ -268,6 +280,14 @@ def handle_client(conn, addr):
             # --- CASINO ---
             if message.upper().startswith("!КАЗИНО"):
                 handle_casino(user, message)
+                continue
+
+            # --- BLACK JACK ---
+            if message.upper().startswith("!БЛЕКДЖЕК"):
+                if user.in_game != "БЛЕКДЖЕК":
+                    blackjack_start(user)
+                else:
+                    broadcast(f"[БЛЕКДЖЕК] {user.username}, ты уже в игре")
                 continue
             # --- STATS ----
             if message.upper() == "!ПРОФИЛЬ":
