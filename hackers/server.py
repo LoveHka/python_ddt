@@ -21,7 +21,7 @@ class User:
         self.money = 0
 
         # --- game state ---
-        self.in_game = False
+        self.in_game = "none"
         self.secret_number = None
         self.attempts_left = 0
 
@@ -102,18 +102,18 @@ def send_to_client(conn, message):
 
 # ---------- Game Random ----------
 def start_game(user):
-    user.in_game = True
-    user.secret_number = random.randint(0, 20)
+    user.in_game = "УГАДАЙКА"
+    user.secret_number = random.randint(1, 20)
     user.attempts_left = 5
 
-    broadcast(f"[GAME] {user.username}, у тебя 5 попытки. Я загадал число от 0 до 20")
+    broadcast(f"[УГАДАЙКА] {user.username}, у тебя 5 попыток. Я загадал число от 1 до 20")
 
 
 def handle_guess(user, conn, message):
     try:
         guess = int(message)
     except ValueError:
-        send_to_client(conn, f"[GAME] {user.username}, введи число")
+        send_to_client(conn, f"[УГАДАЙКА] {user.username}, введи число")
         return
 
     user.attempts_left -= 1
@@ -125,13 +125,13 @@ def handle_guess(user, conn, message):
         users_db[user.username]["exp"] += reward_e
         save_users()
 
-        broadcast(f"[GAME] {user.username} угадал число {user.secret_number} и получил {reward_m}$ и {reward_e} exp")
-        user.in_game = False
+        broadcast(f"[УГАДАЙКА] {user.username} угадал число {user.secret_number} и получил {reward_m}$ и {reward_e} exp")
+        user.in_game = "none"
         return
 
     if user.attempts_left <= 0:
-        send_to_client(conn,f"[GAME] {user.username} проиграл. Было число: {user.secret_number}")
-        user.in_game = False
+        send_to_client(conn,f"[УГАДАЙКА] {user.username} проиграл. Было число: {user.secret_number}")
+        user.in_game = "none"
         return
 
     if guess < user.secret_number:
@@ -139,7 +139,7 @@ def handle_guess(user, conn, message):
     else:
         hint = "меньше"
 
-    send_to_client(conn,f"[GAME] {user.username}, неверно. Подсказка: {hint}. Осталось попыток: {user.attempts_left}")
+    send_to_client(conn,f"[УГАДАЙКА] {user.username}, неверно. Подсказка: {hint}. Осталось попыток: {user.attempts_left}")
 
 
 # --- CSASINO
@@ -148,57 +148,57 @@ def handle_casino(user, message):
     parts = message.split()
 
     if len(parts) < 2:
-        broadcast(f"[CASINO] {user.username}, используй: CASINO <ставка>")
+        broadcast(f"[КАЗИНО] {user.username}, используй: !КАЗИНО <ставка>")
         return
 
     try:
         bet = int(parts[1])
     except ValueError:
-        broadcast(f"[CASINO] {user.username}, ставка должна быть числом")
+        broadcast(f"[КАЗИНО] {user.username}, ставка должна быть числом")
         return
 
     if bet <= 0:
-        broadcast(f"[CASINO] {user.username}, ставка должна быть больше 0")
+        broadcast(f"[КАЗИНО] {user.username}, ставка должна быть больше 0")
         return
 
     current_money = users_db.get(user.username, {}).get("money", 0)
 
     if current_money <= 0:
-        broadcast(f"[CASINO] {user.username}, у тебя нет денег для игры")
+        broadcast(f"[КАЗИНО] {user.username}, у тебя нет денег для игры")
         return
 
     if bet > current_money:
-        broadcast(f"[CASINO] {user.username}, недостаточно денег. Баланс: {current_money}$")
+        broadcast(f"[КАЗИНО] {user.username}, недостаточно денег. Баланс: {current_money}$")
         return
 
-    broadcast(f"[CASINO] {user.username} ставит {bet}$... Крутим рулетку 🎰")
+    broadcast(f"[КАЗИНО] {user.username} ставит {bet}$... Крутим рулетку")
 
     roll = random.randint(1, 100)
 
     if roll <= 50:
         users_db[user.username]["money"] -= bet
         save_users()
-        broadcast(f"[CASINO] ❌ Не повезло... шарик уходит мимо. Ты теряешь {bet}$")
+        broadcast(f"[КАЗИНО] Не повезло... шарик уходит мимо. Ты теряешь {bet}$")
 
     elif roll <= 85:
         users_db[user.username]["money"] += bet
         save_users()
-        broadcast(f"[CASINO] ✅ Удача на твоей стороне! Ставка сыграла")
-        broadcast(f"[CASINO] ➕ Ты выигрываешь {bet}$")
+        broadcast(f"[КАЗИНО] Удача на твоей стороне! Ставка сыграла")
+        broadcast(f"[КАЗИНО] Ты выигрываешь {bet}$")
 
     else:
         users_db[user.username]["money"] += bet * 2
         save_users()
-        broadcast(f"[CASINO] 🔥 ДЖЕКПОТ!!! Невероятное везение!")
-        broadcast(f"[CASINO] 💎 Ты получаешь {bet * 2}$ сверху")
+        broadcast(f"[КАЗИНО] ДЖЕКПОТ!!! Невероятное везение!")
+        broadcast(f"[КАЗИНО] Ты получаешь {bet * 2}$ сверху")
 
-    broadcast(f"[CASINO] 💰 Текущий баланс: {users_db[user.username]['money']}$")
+    broadcast(f"[КАЗИНО] Текущий баланс: {users_db[user.username]['money']}$")
 
 
 # ---------- Client Handler ----------
 def handle_client(conn, addr):
-    broadcast(f"[+] Подключился клиент: {addr}\n Пиши REGISTER <логин> <пароль>\n Или LOGIN <логин> <пароль>")
-    send_to_client(conn, f"[+] Подключился клиент: {addr}\n Пиши REGISTER <логин> <пароль>\n Или LOGIN <логин> <пароль>")
+    #broadcast(f"[+] Подключился клиент: {addr}\n Пиши REGISTER <логин> <пароль>\n Или LOGIN <логин> <пароль>")
+    send_to_client(conn, f"[+] Подключился клиент: {addr}\n Пиши \"!РЕГИСТРАЦИЯ имя пароль\"\n Или \"!ВХОД имя пароль\"")
     user = None
 
     try:
@@ -213,56 +213,59 @@ def handle_client(conn, addr):
             if user is None:
                 parts = message.split()
                 if len(parts) < 3:
+                    send_to_client(conn, "Что-то не сходится... Попробуй снова!")
                     continue
 
                 command, username, password = parts[0], parts[1], parts[2]
 
-                if command.upper() == "REGISTER":
+                if command.upper() == "!РЕГИСТРАЦИЯ":
                     ok, _ = register(username, password)
                     if ok:
                         user = User(username, addr)
                         clients[conn] = user
                         broadcast(f"[REG] Новый пользователь: {username}")
+                        continue
 
-                elif command.upper() == "LOGIN":
+                elif command.upper() == "!ВХОД":
                     ok, _ = login(username, password)
 
                     if ok:
                         user = User(username, addr)
                         clients[conn] = user
                         broadcast(f"[LOGIN] {username} вошел ({addr})")
+                        continue
 
-                continue
+                send_to_client(conn, "Что-то не сходится... Попробуй снова!")
 
             # --- AFTER LOGIN ---
-            if message.upper() == "LIST":
+            if message.upper() == "!ОНЛАЙН":
                 user_list = [u.username for u in clients.values()]
                 broadcast("[ONLINE] \n > "+ '\n > '.join(user_list))
                 continue
 
             # --- START GAME ---
-            if message.upper() == "GAME":
-                if not user.in_game:
+            if message.upper() == "!УГАДАЙКА":
+                if user.in_game != "УГАДАЙКА":
                     start_game(user)
                 else:
-                    broadcast(f"[GAME] {user.username}, ты уже в игре")
+                    broadcast(f"[УГАДАЙКА] {user.username}, ты уже в игре")
                 continue
 
             # --- GAME PROCESS ---
-            if user.in_game:
+            if user.in_game == "УГАДАЙКА":
                 handle_guess(user, conn, message)
                 continue
             # --- CASINO ---
-            if message.upper().startswith("CASINO"):
+            if message.upper().startswith("!КАЗИНО"):
                 handle_casino(user, message)
                 continue
             # --- STATS ----
-            if message.upper() == "STATS":
+            if message.upper() == "!ПРОФИЛЬ":
                 data = users_db.get(user.username, {})
                 exp = data.get("exp", 0)
                 money = data.get("money", 0)
 
-                broadcast(f"""[STATS] {user.username}
+                broadcast(f"""[ПРОФИЛЬ] {user.username}
  > EXP: {exp}
  > MONEY: {money}""")
                 continue
@@ -299,5 +302,5 @@ def start_server():
         thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
         thread.start()
 
-
+print(HOST, PORT)
 start_server()
