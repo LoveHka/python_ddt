@@ -10,14 +10,15 @@ sock.connect((HOST, PORT))  # Подключаемся к серверу
 
 root = tk.Tk()              # Главное окно
 root.title("Чат ДДТ !!!")   # Название программы
+root.configure(bg="#2f2f2f")
 
-text = tk.Text(root, height=40, width=100)  # Добавляем окошко с текстом
+text = tk.Text(root, height=30, width=100, font=("", 14))  # Добавляем окошко с текстом
 text.pack()                         # Кладем его на главное окно
 
 frame = tk.Frame(root)          # Контейнер для ввода
 frame.pack()                    # Кладем контейнер в окно
 
-entry = tk.Entry(frame, width=90)   # Создаем поле для ввода
+entry = tk.Entry(frame, width=70, font=("", 18))   # Создаем поле для ввода
 entry.pack(side="left")             # Кладем в контейнер слева направо
 
 def send():             # Функция для отправки сообщения
@@ -27,6 +28,8 @@ def send():             # Функция для отправки сообщен�
 
 btn = tk.Button(frame, text="Отправить", command=send) # Кнопка отправки
 btn.pack(side="left")       # Кладем вслед за полем ввода
+
+root.bind("<Return>", lambda event: btn.invoke())
 
 def recive():   # Функция для получения сообщений
     while True: # Бесконечго делаем
