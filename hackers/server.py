@@ -32,6 +32,16 @@ class User:
             "money": self.money
         }
 
+help_message = """----------------------------------------------------------
+    Добро пожаловать на сервер!
+Общайся, играй, зарабатывай и трать монетки!
+Список команд:
+!УГАДАЙКА               - Игра "Угадай число"
+!КАЗИНО <ставка>        - Сделать ставку в казино
+!ПРОФИЛЬ                - Показать свою статистику
+!ОНЛАЙН                 - Список игроков онлайн
+----------------------------------------------------------
+"""
 
 # ---------- Persistence ----------
 def load_users():
@@ -236,7 +246,7 @@ def handle_client(conn, addr):
                         continue
 
                 send_to_client(conn, "Что-то не сходится... Попробуй снова!")
-
+                continue
             # --- AFTER LOGIN ---
             if message.upper() == "!ОНЛАЙН":
                 user_list = [u.username for u in clients.values()]
@@ -269,6 +279,9 @@ def handle_client(conn, addr):
  > EXP: {exp}
  > MONEY: {money}""")
                 continue
+
+            if message.upper() == "!ПОМОЩЬ":
+                send_to_client(conn, help_message)
 
             # Основной вывод на экран ("большой экран")
             broadcast(f"[{user.username}] {message}")
