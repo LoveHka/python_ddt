@@ -1,43 +1,53 @@
 import tkinter as tk
 from tkinter import ttk
-
-
-#  🐱  😿  👻
-#  🐶  😟  🦴
-#  🤖  ⚙️  🔌
-#  👽  🛸  ✨
-#  🐉  🥚  🔥
-#  🦄  ☁️  🌈
-#  🐼  🎋  🐾
-#  🦊  🌲  🍃
-#  🐸  💧  🍄
-#  🐧  ❄️  🧊
+import os
 
 # ==========================================================
-# КЛАСС ПИТОМЦА ( его Вам можно менять!!! )
+# 🖼️ НАСТРОЙКИ ИЗОБРАЖЕНИЙ (ВСТАВЬТЕ СВОИ ПУТИ СЮДА!)
 # ==========================================================
+# Убедитесь, что файлы имеют формат .gif или .png
+IMAGE_FILES = {
+    "happy": "happy_cat.gif",  # Обычное состояние
+    "sad": "sad_cat.gif",  # Сытость < 30
+    "ghost": "ghost_cat.gif"  # Сытость <= 0
+}
 
+
+# ==========================================================
+# КЛАСС ПИТОМЦА
+# ==========================================================
 class VirtualPet:
     def __init__(self):
-        # 1. Характеристики (Число = появится полоска)
         self.имя = "Кеша"
         self.здоровье = 100
         self.счастье = 50
         self.сытость = 80
 
-        # Вид питомца (эмодзи или текст)
-        self.вид = "🐱"
+        # Загружаем изображения сразу, чтобы они не пропали из памяти
+        self.images = {}
+        self.current_state = "happy"  # Текущее состояние для отображения
 
-    # 2. Действия (Название начинается с 'кнопка_' = появится кнопка)
+        for state, filename in IMAGE_FILES.items():
+            if os.path.exists(filename):
+                try:
+                    # PhotoImage должен быть сохранен в переменную объекта, иначе исчезнет
+                    self.images[state] = tk.PhotoImage(file=filename)
+                except Exception as e:
+                    print(f"Ошибка загрузки {filename}: {e}")
+                    self.images[state] = None
+            else:
+                print(f"Файл не найден: {filename}")
+                self.images[state] = None
+
     def кнопка_покормить(self):
         """Покормить питомца"""
-        self.сытость = self.сытость + 20
-        self.здоровье = self.здоровье + 2
+        self.сытость = min(100, self.сытость + 20)
+        self.здоровье = min(100, self.здоровье + 2)
         return "Ням-ням! +20 к сытости"
 
     def кнопка_поиграть(self):
         """Поиграть"""
-        self.счастье = self.счастье + 15
+        self.счастье = min(100, self.счастье + 15)
         self.сытость -= 10
         return "Уиии! Как весело!"
 
@@ -46,24 +56,24 @@ class VirtualPet:
         self.сытость -= 2
         self.счастье -= 1
 
+        # Логика смены состояния (вида)
         if self.сытость <= 0:
-            self.здоровье = self.здоровье - 5
-            self.вид = "👻"
+            self.здоровье = max(0, self.здоровье - 5)
+            self.current_state = "ghost"
         elif self.сытость < 30:
-            self.вид = "😿"
+            self.current_state = "sad"
         else:
-            self.вид = "🐱"
+            self.current_state = "happy"
 
-        # Если параметр больше 100, то не даем расти выше
+        # Ограничиваем значения максимумом 100
         self.счастье = min(100, self.счастье)
         self.сытость = min(100, self.сытость)
         self.здоровье = min(100, self.здоровье)
 
 
 # ==========================================================
-# ДВИЖОК - Вот тут лучше ничего не менять )
+# ДВИЖОК
 # ==========================================================
-
 class PetApp:
     def __init__(self, root, pet_instance):
         self.pet = pet_instance
@@ -80,25 +90,42 @@ class PetApp:
         self.main_container = tk.Frame(self.root)
         self.main_container.pack(expand=True, fill="both")
 
-        self.lbl_icon = tk.Label(self.main_container, text=self.pet.вид, font=("Arial", 80))
-        self.lbl_icon.pack(pady=20)
+        # --- Иконка питомца ---
+        # Пробуем поставить картинку, если нет - ставим эмодзи
+        initial_img = self.pet.images.get(self.pet.current_state)
 
-        stats_frame = tk.Frame(self.main_container)
-        stats_frame.pack(fill="x", padx=40)
+        if initial_img:
+            self.lbl_icon = tk.Label(self.main_container, image=initial_img)
+            self.lbl_icon.image = initial_img  # Сохраняем ссылку!
+        else:
+            self.lbl_icon = tk.Label(self.main_container, text="🐱", font=("Arial", 80))
+
+        self.lbl_icon.pack(pady=20)
+        down = tk.Frame(self.main_container)
+        down.pack(fill="x", padx=40)
+
+
+
+        # --- Полоски характеристик ---
+        stats_frame = tk.Frame(down)
+        stats_frame.pack(side="left", fill="x", padx=40)
 
         for attr, value in vars(self.pet).items():
-            if isinstance(value, (int, float)) and attr != "вид":
+            # Пропускаем служебные поля и картинки
+            if isinstance(value, (int, float)) and attr not in ["images"]:
                 tk.Label(stats_frame, text=attr.capitalize(), font=("Arial", 10, "bold")).pack(anchor="w")
                 progress = ttk.Progressbar(stats_frame, length=200, mode='determinate')
                 progress.pack(fill="x", pady=(0, 10))
                 self.stats_bars[attr] = progress
 
-        self.log = tk.Label(self.main_container, text="Привет! Я твой питомец.", fg="blue",
+        # --- Лог сообщений ---
+        self.log = tk.Label(down, text="Привет! Я твой питомец.", fg="blue",
                             font=("Arial", 10, "italic"))
-        self.log.pack(pady=20)
+        self.log.pack(side="left")
 
-        buttons_frame = tk.Frame(self.main_container)
-        buttons_frame.pack(pady=10)
+        # --- Кнопки действий ---
+        buttons_frame = tk.Frame(down)
+        buttons_frame.pack(side="left")
 
         for method_name in dir(self.pet):
             if method_name.startswith("кнопка_"):
@@ -133,12 +160,22 @@ class PetApp:
     def refresh_ui(self):
         if not self.is_running: return
 
-        # Проверка здоровья (скрытая логика)
+        # Проверка здоровья
         if getattr(self.pet, "здоровье", 100) <= 0:
             self.show_game_over()
             return
 
-        self.lbl_icon.config(text=self.pet.вид)
+        # Обновляем картинку
+        new_img = self.pet.images.get(self.pet.current_state)
+        if new_img:
+            self.lbl_icon.config(image=new_img)
+            self.lbl_icon.image = new_img  # Важно: сохраняем ссылку на новую картинку
+        else:
+            # Если картинки нет, показываем эмодзи по состоянию
+            emoji_map = {"happy": "🐱", "sad": "😿", "ghost": "👻"}
+            self.lbl_icon.config(text=emoji_map.get(self.pet.current_state, "❓"), font=("Arial", 80))
+
+        # Обновляем полоски
         for attr, bar in self.stats_bars.items():
             val = getattr(self.pet, attr)
             bar['value'] = val
